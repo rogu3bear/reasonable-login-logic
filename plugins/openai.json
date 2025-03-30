@@ -1,0 +1,49 @@
+{
+  "id": "openai",
+  "name": "OpenAI API Key",
+  "description": "Set up API keys for OpenAI services like GPT-4 and DALL-E",
+  "icon": "🧠",
+  "type": "apiKey",
+  "setupSteps": [
+    { 
+      "type": "link", 
+      "label": "Open OpenAI API Keys Page", 
+      "url": "https://platform.openai.com/account/api-keys",
+      "description": "Log in to your OpenAI account and navigate to the API Keys section of the user settings." 
+    },
+    { 
+      "type": "instruction", 
+      "text": "Click on **Create new secret key** to generate a new API key." 
+    },
+    { 
+      "type": "input", 
+      "label": "OpenAI Secret Key", 
+      "id": "openai_api_key",
+      "hint": "Copy the newly generated key from the OpenAI page and paste it here." 
+    },
+    { 
+      "type": "verify", 
+      "action": "verifyOpenAIKey"
+    }
+  ],
+  "commonIssues": {
+    "invalid_key_pattern": "sk-...",
+    "verification_error_401": "Invalid API key. Please check that you've copied the key correctly.",
+    "verification_error_429": "Rate limit exceeded. Your API key works, but has hit the rate limit.",
+    "verification_endpoint": "https://api.openai.com/v1/models"
+  },
+  "frameworks": {
+    "langchain": {
+      "env_var": "OPENAI_API_KEY",
+      "import_code": "from langchain.llms import OpenAI\nllm = OpenAI()"
+    },
+    "autogpt": {
+      "env_var": "OPENAI_API_KEY",
+      "config_file": ".env"
+    }
+  },
+  "automationActions": {
+    "fetchKey": "Automatically fetches a newly created API key from the OpenAI dashboard.",
+    "verifyKey": "Verifies if the API key is valid by making a test request."
+  }
+} 
