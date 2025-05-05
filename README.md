@@ -40,7 +40,7 @@ This application takes security seriously:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/rogu3bear/api-credential-manager.git
+git clone https://github.com/rogu3bear/reasonable-login-logic.git
 cd api-credential-manager
 ```
 
