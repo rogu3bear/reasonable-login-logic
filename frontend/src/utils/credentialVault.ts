@@ -1,5 +1,6 @@
 import { Credential } from '../types/ServiceDefinition';
 import * as encryption from './encryption';
+import { openCredentialDB } from './indexedDb';
 
 const VAULT_STORAGE_KEY = 'credential_vault';
 const IS_ELECTRON = window && (window as any).electron !== undefined;
@@ -84,7 +85,7 @@ export class CredentialVault {
    */
   private async getSalt(): Promise<Uint8Array | undefined> {
     try {
-      const db = await this.openIndexedDB();
+      const db = await openCredentialDB();
       const tx = db.transaction('vault', 'readonly');
       const store = tx.objectStore('vault');
       const storedSalt = await store.get('salt');
@@ -109,7 +110,7 @@ export class CredentialVault {
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
       
-      const db = await this.openIndexedDB();
+      const db = await openCredentialDB();
       const tx = db.transaction('vault', 'readwrite');
       const store = tx.objectStore('vault');
       await store.put(hexSalt, 'salt');
@@ -120,24 +121,7 @@ export class CredentialVault {
     }
   }
 
-  /**
-   * Opens IndexedDB database
-   */
-  private async openIndexedDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open('credential_vault', 1);
-      
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result);
-      
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains('vault')) {
-          db.createObjectStore('vault');
-        }
-      };
-    });
-  }
+
 
   /**
    * Convert hex string to Uint8Array

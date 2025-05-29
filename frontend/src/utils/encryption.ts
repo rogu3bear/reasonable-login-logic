@@ -1,3 +1,5 @@
+import { openCredentialDB } from './indexedDb';
+
 /**
  * Utility for encrypting and decrypting credentials using Web Crypto API
  * Implements AES-GCM encryption with PBKDF2 key derivation
@@ -8,7 +10,7 @@ const KEY_LENGTH = 256;
 const STORAGE_KEY = 'vault_encryption_key';
 const SALT_LENGTH = 32; // Increased from 16 for better security
 const IV_LENGTH = 12;
-const PBKDF2_ITERATIONS = 100000; // Increased from 100000 for better security
+const PBKDF2_ITERATIONS = 100000; // PBKDF2 iteration count
 const PBKDF2_HASH = 'SHA-256';
 
 /**
@@ -76,7 +78,7 @@ export async function generateEncryptionKey(): Promise<CryptoKey> {
 export async function storeEncryptionKey(key: CryptoKey): Promise<void> {
   try {
     const exportedKey = await crypto.subtle.exportKey('raw', key);
-    const db = await openIndexedDB();
+    const db = await openCredentialDB();
     const tx = db.transaction('keys', 'readwrite');
     const store = tx.objectStore('keys');
     await store.put(arrayBufferToBase64(exportedKey), STORAGE_KEY);
@@ -92,7 +94,7 @@ export async function storeEncryptionKey(key: CryptoKey): Promise<void> {
  */
 export async function getStoredEncryptionKey(): Promise<CryptoKey | null> {
   try {
-    const db = await openIndexedDB();
+    const db = await openCredentialDB();
     const tx = db.transaction('keys', 'readonly');
     const store = tx.objectStore('keys');
     const keyData = await store.get(STORAGE_KEY);
@@ -114,24 +116,7 @@ export async function getStoredEncryptionKey(): Promise<CryptoKey | null> {
   }
 }
 
-/**
- * Opens IndexedDB database
- */
-async function openIndexedDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('credential_vault', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains('keys')) {
-        db.createObjectStore('keys');
-      }
-    };
-  });
-}
+
 
 /**
  * Encrypts a string value using AES-GCM

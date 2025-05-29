@@ -2,7 +2,6 @@ import { ipcMain, BrowserWindow } from 'electron';
 import * as express from 'express';
 import * as http from 'http';
 import * as crypto from 'crypto';
-import * as querystring from 'querystring';
 import * as url from 'url';
 import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
