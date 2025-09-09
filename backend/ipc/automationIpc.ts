@@ -51,7 +51,6 @@ async function createSecureContext(browser: Browser): Promise<BrowserContext> {
   return await browser.newContext({
     userAgent: 'API Credential Manager/1.0',
     viewport: { width: 1920, height: 1080 },
-    userDataDir: USER_DATA_DIR,
     ignoreHTTPSErrors: false,
     bypassCSP: false,
     javaScriptEnabled: true,
